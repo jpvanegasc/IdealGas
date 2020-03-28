@@ -13,3 +13,6 @@ const double Xi = 0.06626458266981849*(-1);
 
 const double coef1 = (1 - 2*Lambda)/2;
 const double coef2 = (1 - 2*(Xi+Zi));
+
+// Implementation
+const int N = 1;

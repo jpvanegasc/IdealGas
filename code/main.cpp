@@ -1,7 +1,7 @@
-#include"body.h"
-#include"collider.h"
+#include"molecular_dynamics.h"
 
 int main(int argc, char *argv[]){
-    Body test;
+    Body Molecule[N];
+    
     return 0;
 }
