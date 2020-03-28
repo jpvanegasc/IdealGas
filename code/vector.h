@@ -4,12 +4,12 @@
  */
 #include <iostream>
 #include <cmath>
-using namespace std;
 
 class Vector3D{
-    double v[3];
+    double *v = NULL;
     public:
         Vector3D(double =0.0, double =0.0, double =0.0);
+        ~Vector3D();
         void load(double x0, double y0, double z0);
         void show(void);
         /* @return x component*/
@@ -37,7 +37,11 @@ class Vector3D{
 
 /* Initialize vector. Defaults to zero */
 Vector3D::Vector3D(double x, double y, double z){
+    v = new double[3];
     load(x,y,z);
+}
+Vector3D::~Vector3D(){
+    delete[] v;
 }
 /* Load vector values */
 void Vector3D::load(double x0, double y0, double z0){
