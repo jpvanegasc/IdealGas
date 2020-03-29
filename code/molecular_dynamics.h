@@ -9,6 +9,7 @@ class Body{
         void add_force(Vector3D dF);
         void move_r(double dt, double coef){r += V*(dt*coef);}
         void move_v(double dt, double coef){V += F*(dt*coef/m);}
+        void print(void);
         void delete_f(void){F.load(0,0,0);}
         double get_x(void){return r.x();} 
         double get_y(void){return r.y();} 
@@ -42,15 +43,51 @@ void Body::add_force(Vector3D dF){
         if(hy2 > 0) Fy = 1e4*std::pow(hy2, 1.5);
     }
 
-    Vector3D aux; aux.load(Fx, Fy, 0);
+    Vector3D aux(Fx, Fy, 0);
     F += dF + aux;
+}
+void Body::print(void){
+    std::cout<<" , "<<r.x()<<"+"<<R<<"*cos(t),"<<r.y()<<"+"<<R<<"*sin(t)";
 }
 
 class Collider{
     public:
-        Collider();
+        void calculate_force_pair(Body &molecule1, Body &molecule2);
+        void calculate_all_forces(Body *molecule);
+        void move_with_pefrl(Body *molecule, double dt);
 };
 
-Collider::Collider(){
+void Collider::calculate_force_pair(Body &molecule1, Body &molecule2){
+    Vector3D dr = molecule2.r - molecule1.r;
+    
+    double s = (molecule1.R + molecule2.R) - norm(molecule1.r-molecule2.r);
+    double F_aux = 1e4*std::pow(s, 1.5);
 
+    Vector3D dF = dr*F_aux;
+    molecule2.add_force(dF); molecule1.add_force((-1.0)*dF);
+}
+
+void Collider::calculate_all_forces(Body *molecule){
+    for(int i=0; i<N; i++) molecule[i].delete_f();
+    
+    for(int i=0; i<N; i++)
+        for(int j=i+1; j<N; j++)
+            calculate_force_pair(molecule[i], molecule[j]);
+}
+
+void Collider::move_with_pefrl(Body *molecule, double dt){
+    int i;
+    for(i=0;i<N;i++) molecule[i].move_r(dt,Zi);
+    calculate_all_forces(molecule);
+    for(i=0;i<N;i++) molecule[i].move_v(dt,coef1);
+    for(i=0;i<N;i++) molecule[i].move_r(dt,Xi);
+    calculate_all_forces(molecule);
+    for(i=0;i<N;i++) molecule[i].move_v(dt,Lambda);
+    for(i=0;i<N;i++) molecule[i].move_r(dt,coef2);
+    calculate_all_forces(molecule);
+    for(i=0;i<N;i++) molecule[i].move_v(dt,Lambda);
+    for(i=0;i<N;i++) molecule[i].move_r(dt,Xi);
+    calculate_all_forces(molecule);
+    for(i=0;i<N;i++) molecule[i].move_v(dt,coef1);
+    for(i=0;i<N;i++) molecule[i].move_r(dt,Zi);
 }
