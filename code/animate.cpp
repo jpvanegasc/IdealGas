@@ -1,15 +1,18 @@
 /**
- * Main module. 
- * This program is for calculating and saving data. For animations please use animate.cpp
+ * Animation module.
+ * For calculating and saving data please use main.cpp
  */
 #include"molecular_dynamics.h"
 #include"random64.h"
+#include"animation.hpp"
 
 int main(int argc, char *argv[]){
     Body Molecule[N];
     Collider Newton;
     CRandom ran64(1);
-    double t;
+    double t,tdibujo;
+
+    start_animation(argc);
 
     double k_T=100;
     double x0, y0, theta, Vx0, Vy0;
@@ -26,7 +29,14 @@ int main(int argc, char *argv[]){
 
     double T_sim=30.0,T_eq=100.0;
         
-    for(t=0.0; t<T_eq+T_sim; t+=dt){
+    for(t=tdibujo=0.0;t<T_eq+T_sim;t+=dt,tdibujo+=dt){        
+        if(tdibujo>0.05){
+            begin_frame(argc);
+            for(int i=0; i<N; i++) Molecule[i].print();
+            end_frame(argc);
+            tdibujo=0.0;
+        }
+
         Newton.move_with_pefrl(Molecule, dt);
     }
     

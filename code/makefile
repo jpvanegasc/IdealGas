@@ -9,14 +9,14 @@ main.o : main.cpp *.h
 	time ./$@
 
 .PHONY : animation
-animation : main.cpp *.h animation.hpp
-	g++ $(C_STD) -O2 $<
+animation : animate.cpp *.h animation.hpp
+	g++ $(C_STD) -O2 $< -o animate.o
 	time ./a.out animate | gnuplot
 
 .PHONY : save_gif
-save_gif : main.cpp *.h animation.hpp
-	g++ $(C_STD) -O2 $<
-	time ./a.out animate save| gnuplot
+save_gif : animate.cpp *.h animation.hpp
+	g++ $(C_STD) -O2 $< -o animate.o
+	time ./a.out animate save | gnuplot
 
 .PHONY : debug
 debug : main.cpp *.h
