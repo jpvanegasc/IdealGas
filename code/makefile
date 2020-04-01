@@ -8,10 +8,15 @@ main.o : main.cpp *.h
 	g++ $(C_STD) -O2 $< -o $@
 	time ./$@
 
-.PHONY : parallel
-parallel : main.cpp *.h
-	g++ $(C_STD) -fopenmp -O2 $<
-	time ./a.out
+.PHONY : animation
+animation : main.cpp *.h animation.hpp
+	g++ $(C_STD) -O2 $<
+	time ./a.out animate | gnuplot
+
+.PHONY : save_gif
+save_gif : main.cpp *.h animation.hpp
+	g++ $(C_STD) -O2 $<
+	time ./a.out animate save| gnuplot
 
 .PHONY : debug
 debug : main.cpp *.h
