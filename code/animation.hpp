@@ -1,12 +1,17 @@
+/**
+ * Defines useful functions for animationg with gnuplot.
+ * @param animation: If 2, plot without saving. If 3, saves in a gif
+ */
+
 void start_animation(int animation){
     if(animation > 1){
         if(animation == 3){
             std::cout << "set terminal gif animate\n"; 
-            std::cout << "set output 'movie.gif'";
+            std::cout << "set output 'movie.gif'\n";
         }
         std::cout << "unset key\n";
-        std::cout << "set xrange[-10:" << Lx+10 << "]\n";
-        std::cout << "set yrange[-10:" << Ly+10 << "]\n";
+        std::cout << "set xrange[-5:" << Lx+5 << "]\n";
+        std::cout << "set yrange[-5:" << Ly+5 << "]\n";
         std::cout << "set size ratio -1\n";
         std::cout << "set parametric\n";
         std::cout << "set trange [0:7]\n";
