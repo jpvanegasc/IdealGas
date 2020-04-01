@@ -11,12 +11,12 @@ main.o : main.cpp *.h
 .PHONY : animation
 animation : animate.cpp *.h animation.hpp
 	g++ $(C_STD) -O2 $< -o animate.o
-	time ./a.out animate | gnuplot
+	time ./animate.o animate | gnuplot
 
 .PHONY : save_gif
 save_gif : animate.cpp *.h animation.hpp
 	g++ $(C_STD) -O2 $< -o animate.o
-	time ./a.out animate save | gnuplot
+	time ./animate.o animate save | gnuplot
 
 .PHONY : debug
 debug : main.cpp *.h
