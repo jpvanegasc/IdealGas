@@ -2,6 +2,7 @@
  * Animation module.
  * For calculating and saving data please use main.cpp
  */
+#include<vector>
 #include"molecular_dynamics.h"
 #include"random64.h"
 #include"animation.hpp"
@@ -11,6 +12,7 @@ int main(int argc, char *argv[]){
     Collider Newton;
     CRandom ran64(1);
     double t,tdibujo;
+    std::vector<std::vector<double>> positions;
 
     start_animation(argc);
 
@@ -33,10 +35,15 @@ int main(int argc, char *argv[]){
 
     double T_sim=5.0,T_eq=00.0;
         
-    for(t=tdibujo=0.0; t<T_eq+T_sim; t+=dt,tdibujo+=dt){        
+    for(t=tdibujo=0.0; t<T_eq+T_sim; t+=dt,tdibujo+=dt){  
+        std::vector<double> coordinates;
+            coordinates.push_back(Molecule[0].get_x()); coordinates.push_back(Molecule[0].get_y());
+            positions.push_back(coordinates);      
         if(tdibujo>0.05){
             begin_frame(argc);
             for(int i=0; i<N; i++) Molecule[i].print();
+            for(int i=0; i<positions.size(); i++)
+                plot_single_point(argc, positions[i][0], positions[i][1]);
             end_frame(argc);
             tdibujo=0.0;
         }
