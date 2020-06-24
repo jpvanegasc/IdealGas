@@ -2,9 +2,12 @@
 #include<cmath>
 #include<fstream>
 
-// Geometry costants
+// Geometry constants
 const double square = 100.0;
 const double Lx = square, Ly = square;
+
+// Diffusion
+const double GAMMA = 10.0;
 
 // PEFRL
 const double Zi = 0.1786178958448091e0;
