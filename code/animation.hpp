@@ -31,3 +31,8 @@ void end_frame(int animation){
     if (animation > 1)
         std::cout << std::endl;
 }
+
+void plot_single_point(int animation, double x, double y){
+    if (animation > 1)
+        std::cout << " , '< echo " << x << ' ' << y << "' w points";
+}
