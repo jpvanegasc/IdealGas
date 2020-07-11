@@ -2,24 +2,16 @@
 #include<cmath>
 #include<fstream>
 
+#include"random64.h"
+
 // Geometry constants
-const double square = 100.0;
-const double Lx = square, Ly = square;
+const int square = 8;
+const int Lx = square, Ly = square;
+const int L2 = Lx*Ly;
 
-// Diffusion
-const double GAMMA = 10.0;
+// Time constants
+const int t_eq = (int)(600*std::pow(std::sqrt(L2)/8.0, 2.1));
+const int t_corr = (int)(5*10.8*std::pow(std::sqrt(L2)/8.0, 2.125));
 
-// PEFRL
-const double Zi = 0.1786178958448091e0;
-const double Lambda = 0.2123418310626054*(-1);
-const double Xi = 0.06626458266981849*(-1);
-
-const double coef1 = (1 - 2*Lambda)/2;
-const double coef2 = (1 - 2*(Xi+Zi));
-
-// Implementation
-const int Nx = 10, Ny = 10;
-const int N = Nx*Ny;
-const double R0 = 1.0, m0 = 1.0;
-const double dt = 1.0e-3;
-const double dx = Lx/(Nx+1), dy = Ly/(Ny+1);
+// Thermal constants
+const double kB = 1.0;

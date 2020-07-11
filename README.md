@@ -13,8 +13,6 @@ check the following table:
 | Shell Command   | What it does oversimplified                                               |
 |-----------------|---------------------------------------------------------------------------|
 | make            | Compiles using O2 optimization, c++11 standard and runs program using time|
-| make animation  | Same as make, redirects program output to gnuplot in real time            |
-| make save_gif   | Same as animation, but saves animation in a gif                           |
 | make debug      | Compiles with all warning flags, saves debug info using -g flag and runs  |
 | make valgrind   | Compiles with -g flag and runs using valgrind                             |
 | make cachegrind | Same as valgrind but using runs using cachegrind                          |
