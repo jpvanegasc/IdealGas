@@ -5,63 +5,63 @@
 
 class Metropolis{
     private:
-        int b[Lx][Ly][2];
+        double r[2*N][2];
+
+        double calculate_energy(int n_particle, double x, double y);
     public:
         void initialize(CRandom &ran);
-        double calculate_energy(int ix, int iy, int box);
         void metropolis_step(double beta, CRandom &ran, int box);
         void print(void);
 };
 
-void Metropolis::initialize(CRandom &ran){
-    int n = N;
-    while(n < 0){
-        int r = (int)L2*ran.r(); int i = r%Lx, j = r/Ly;
-        if(b[i][j][0] == 0){
-            b[i][j][0] == 1; n--;
-        }
-    }
-    n = N;
-    while(n < 0){
-        int r = (int)L2*ran.r(); int i = r%Lx, j = r/Ly;
-        if(b[i][j][1] == 0){
-            b[i][j][1] == 1; n--;
-        }
-    }
-}
-
-double Metropolis::calculate_energy(int ix, int iy, int box){
+double Metropolis::calculate_energy(int n_particle, double x, double y){
+    int start = 0, end = N; if(x >= Lx){start = N; end = 2*N;}
     double E = 0;
-    for(int i=0; i<Lx; i++)
-        for(int j=0; j<Ly; j++){
-            if(i == ix && j == iy) continue;
-            if(b[i][j][box] == 0) continue;
-            else if(b[i][j][box] == 1){
-                double r = std::sqrt((i-ix)*(i-ix) + (j-iy)*(j-iy));
-                E += 4*(std::pow(r, -12.0) - std::pow(r, -6.0));
-            }
-        }
+
+    #pragma omp parallel for shared(E, r) reduction(+: E)
+    for(int n=start; n<end; n++){
+        if(n == n_particle) continue;
+        double ix = r[n][0], iy = r[n][1];
+        double r = std::sqrt((ix-x)*(ix-x) + (iy-y)*(iy-y));
+        E += 4*(std::pow(r, -12.0) - std::pow(r, -6.0));
+    }
 
     return E;
 }
 
-void Metropolis::metropolis_step(double beta, CRandom &ran, int box){
-    bool flag = true;
-    while(flag){
-        double r = ran.r(); // Just one random number to save computing time
-        int n = (int)L2*r; int i = n%Lx, j = n/Ly;
-        if(b[i][j][box] == 0) continue;
-        else flag = false;
 
-        double dE = calculate_energy(i, j, box);
-
-        if(dE <= 0){
-            b[i][j][box] *= -1;
-            return;
-        }
-        else if(ran.r() < std::exp(-beta*dE)){
-            b[i][j][box] *= -1;
-            return;
-        }
+void Metropolis::initialize(CRandom &ran){
+    for(int n=0; n<N; n++){
+        r[n][0] = Lx*ran.r(); r[n][1] = Ly*ran.r();
     }
+    for(int n=N; n<2*N; n++){
+        r[n][0] = Lx*ran.r() + Lx; r[n][1] = Ly*ran.r();
+    }
+}
+
+void Metropolis::metropolis_step(double beta, CRandom &ran, int box){
+    int n = (int)N*ran.r() + box*N; double x = r[n][0], y = r[n][1];
+    double drx = dr*(2*ran.r()-1), dry = dr*(2*ran.r()-1);
+
+    double x_new = x + drx, y_new = y + dry;
+    if(x_new < 0) x_new += Lx;
+    else if(x_new > (Lx + box*Lx)) x_new -= Lx;
+    if(y_new < 0) y_new += Ly;
+    if(y_new > Ly) y_new -= Ly;
+
+    double dE = calculate_energy(n, x_new, y_new) - calculate_energy(n, x, y);
+
+    if(dE <= 0){
+        r[n][0] = x_new; r[n][1] = y_new;
+        return;
+    }
+    else if(ran.r() < std::exp(-beta*dE)){
+        r[n][0] = x_new; r[n][1] = y_new;
+        return;
+    }
+}
+
+void Metropolis::print(void){
+    for(int n=0; n<2*N; n++)
+        std::cout << " , " << r[n][0] << "+0.1*cos(t)," << r[n][1] << "+0.1*sin(t)";
 }
