@@ -16,6 +16,15 @@ class Metropolis{
         void print(void);
 };
 
+/**
+ * Calculates the energy for a given particle on a given postion using the Lennard-Jones interaction
+ * potential.
+ * 
+ * @param n_particle: particle id that is being calculated
+ * @params x, y: x and y positions of particle that is being calculated
+ * 
+ * @return Energy for a given particle
+ */
 double Metropolis::calculate_energy(int n_particle, double x, double y){
     double E = 0;
 
@@ -37,7 +46,9 @@ double Metropolis::calculate_energy(int n_particle, double x, double y){
     return E;
 }
 
-
+/**
+ * Initialize both boxes with random positions
+ */
 void Metropolis::initialize(CRandom &ran){
     for(int n=0; n<N; n++){
         r[n][0] = Lx*ran.r(); r[n][1] = Ly*ran.r();
@@ -47,6 +58,13 @@ void Metropolis::initialize(CRandom &ran){
     }
 }
 
+/**
+ * Moves a single particle within its box using the Metropolis criteria, with periodic boundaries.
+ * -> Not very good yet. Selection from within box is not fully correct
+ * 
+ * @param beta: Thermodynamic beta
+ * @param box: id of box frmom which the particle is being selected
+ */
 void Metropolis::metropolis_translation(double beta, CRandom &ran, int box){
     int n = (int)N*ran.r() + box*N; double x = r[n][0], y = r[n][1];
     double drx = dr*(2*ran.r()-1), dry = dr*(2*ran.r()-1);
@@ -73,11 +91,18 @@ void Metropolis::metropolis_translation(double beta, CRandom &ran, int box){
     }
 }
 
+/**
+ * Transfers a single particle from one box to another.
+ * -> Not very good yet. Selection from within box is not fully correct
+ * 
+ * @param from: box from which the particle is being selected
+ * @param destination: box to wich the particle is being selected
+ * @param bata: Thermodynamic beta
+ */
 void Metropolis::metropolis_transfer(int from, int destination, double beta, CRandom &ran){
     int n = (int)N*ran.r() + from*N; double x = r[n][0], y = r[n][1];
     double x_new = Lx*ran.r() + destination*Lx, y_new = Ly*ran.r();
 
-    // Metropolis criteria
     double dE = calculate_energy(n, x_new, y_new) - calculate_energy(n, x, y);
 
     if(dE <= 0){
@@ -90,6 +115,13 @@ void Metropolis::metropolis_transfer(int from, int destination, double beta, CRa
     }
 }
 
+/**
+ * Calculates the number of particles within a given box
+ * 
+ * @param box: id of box which number is being calculated
+ * 
+ * @return Number of particles within the box
+ */
 int Metropolis::get_N(int box){
     int N_particles = 0;
     if(box == 0){
