@@ -10,8 +10,8 @@ void start_animation(int animation){
             std::cout << "set output 'movie.gif'\n";
         }
         std::cout << "unset key\n";
-        std::cout << "set xrange[-5:" << 2*Lx+5 << "]\n";
-        std::cout << "set yrange[-5:" << Ly+5 << "]\n";
+        std::cout << "set xrange[-2:" << 2*Lx+2 << "]\n";
+        std::cout << "set yrange[-2:" << Ly+2 << "]\n";
         std::cout << "set size ratio -1\n";
         std::cout << "set parametric\n";
         std::cout << "set trange [0:7]\n";
@@ -25,6 +25,7 @@ void begin_frame(int animation){
         std::cout << " , " << 2*Lx/7 << "*t," << Ly;        // up wall
         std::cout << " , 0," << Ly/7 << "*t";             // left wall
         std::cout << " , " << 2*Lx << "," << Ly/7 << "*t";  // right wall
+        std::cout << " , " << Lx << "," << Ly/7 << "*t";  // middle wall
     }
 }
 void end_frame(int animation){
