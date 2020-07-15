@@ -5,34 +5,63 @@
 
 class Metropolis{
     private:
-        int m[Lx][Ly]; int E, M;
+        int b[Lx][Ly][2];
     public:
-        void initialize_down(void);
-        void metropolis_step(double beta, CRandom &ran);
-        double get_E(void);
-        double get_M(void);
+        void initialize(CRandom &ran);
+        double calculate_energy(int ix, int iy, int box);
+        void metropolis_step(double beta, CRandom &ran, int box);
+        void print(void);
 };
 
-inline double Metropolis::get_E(void){return (double)E;}
-inline double Metropolis::get_M(void){return (double)std::abs(M);}
-
-void Metropolis::initialize_down(void){
-    for(int i=0; i<Lx; i++)
-        for(int j=0; j<Ly; j++)
-            m[i][j] = -1;
-        M = -L2; E = -2*L2;
+void Metropolis::initialize(CRandom &ran){
+    int n = N;
+    while(n < 0){
+        int r = (int)L2*ran.r(); int i = r%Lx, j = r/Ly;
+        if(b[i][j][0] == 0){
+            b[i][j][0] == 1; n--;
+        }
+    }
+    n = N;
+    while(n < 0){
+        int r = (int)L2*ran.r(); int i = r%Lx, j = r/Ly;
+        if(b[i][j][1] == 0){
+            b[i][j][1] == 1; n--;
+        }
+    }
 }
 
-void Metropolis::metropolis_step(double beta, CRandom &ran){
-    int n = (int)L2*ran.r(); int i = n%Lx, j = n/Ly; // Just one random number to save computing time
-    int dE = 2*m[i][j]*(m[(i+1)%Lx][j] + m[(Lx+i-1)%Lx][j] + m[i][(j+1)%Ly] + m[i][(Ly+j-1)%Ly]);
+double Metropolis::calculate_energy(int ix, int iy, int box){
+    double E = 0;
+    for(int i=0; i<Lx; i++)
+        for(int j=0; j<Ly; j++){
+            if(i == ix && j == iy) continue;
+            if(b[i][j][box] == 0) continue;
+            else if(b[i][j][box] == 1){
+                double r = std::sqrt((i-ix)*(i-ix) + (j-iy)*(j-iy));
+                E += 4*(std::pow(r, -12.0) - std::pow(r, -6.0));
+            }
+        }
 
-    if(dE <= 0){
-        m[i][j] *= -1; E += dE; M += 2*m[i][j];
-        return;
-    }
-    else if(ran.r() < std::exp(-beta*dE)){
-        m[i][j] *= -1; E += dE; M += 2*m[i][j];
-        return;
+    return E;
+}
+
+void Metropolis::metropolis_step(double beta, CRandom &ran, int box){
+    bool flag = true;
+    while(flag){
+        double r = ran.r(); // Just one random number to save computing time
+        int n = (int)L2*r; int i = n%Lx, j = n/Ly;
+        if(b[i][j][box] == 0) continue;
+        else flag = false;
+
+        double dE = calculate_energy(i, j, box);
+
+        if(dE <= 0){
+            b[i][j][box] *= -1;
+            return;
+        }
+        else if(ran.r() < std::exp(-beta*dE)){
+            b[i][j][box] *= -1;
+            return;
+        }
     }
 }
