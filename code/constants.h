@@ -5,10 +5,11 @@
 #include"random64.h"
 
 // Geometry constants
+const int D = 2;
+
 const int N = 80;
-const double square = 16;
-const double Lx = square, Ly = square;
-const double L2 = Lx*Ly;
+const double L = 16;
+const double L2 = L*L;
 
 const double dr = 1;
 
