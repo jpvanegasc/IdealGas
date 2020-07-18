@@ -12,7 +12,6 @@ const double L = 16;
 const double L2 = L*L;
 
 const double dr = 1;
-const int N_iter = N*D;
 const double N_connections = (double)((N*(N-1))/2);
 
 // Time constants

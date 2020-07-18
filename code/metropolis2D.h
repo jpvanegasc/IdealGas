@@ -5,7 +5,7 @@
 
 class Metropolis{
     private:
-        double r[N*D] = {0};
+        double r[N][D] = {0};
 
         double calculate_energy(int n_particle, double x, double y);
         double calculate_r_min(int from, int destination);
@@ -28,10 +28,10 @@ class Metropolis{
 double Metropolis::calculate_energy(int n_particle, double x, double y){
     double E = 0;
 
-    for(int n=0; n<N_iter; n+=2){
+    for(int n=0; n<N; n++){
         if(n == n_particle) continue;
 
-        double ix = r[n], iy = r[n+1];
+        double ix = r[n][0], iy = r[n][1];
         E += 4*(
             std::pow(((ix-x)*(ix-x) + (iy-y)*(iy-y)), -6.0) -
             std::pow(((ix-x)*(ix-x) + (iy-y)*(iy-y)), -3.0)
@@ -49,8 +49,8 @@ double Metropolis::calculate_energy(int n_particle, double x, double y){
  * @return minimum distance
  */
 double Metropolis::calculate_r_min(int from, int destination){
-    double x1 = r[from], y1 = r[from+1];
-    double x2 = r[destination], y2 = r[destination+1];
+    double x1 = r[from][0], y1 = r[from][1];
+    double x2 = r[destination][0], y2 = r[destination][1];
     return std::sqrt(
         (x1 - x2 - L*std::fabs((x1-x2)/L))*(x1 - x2 - L*std::fabs((x1-x2)/L)) +
         (y1 - y2 - L*std::fabs((y1-y2)/L))*(y1 - y2 - L*std::fabs((y1-y2)/L))
@@ -59,8 +59,8 @@ double Metropolis::calculate_r_min(int from, int destination){
 
 /* Initialize with random positions */
 void Metropolis::initialize(CRandom &ran){
-    for(int n=0; n<N_iter; n++){
-        r[n] = L*ran.r(); r[n+1] = L*ran.r();
+    for(int n=0; n<N; n++){
+        r[n][0] = L*ran.r(); r[n][1] = L*ran.r();
     }
 }
 
@@ -70,7 +70,7 @@ void Metropolis::initialize(CRandom &ran){
  * @param beta: Thermodynamic beta
  */
 void Metropolis::metropolis_step(double beta, CRandom &ran){
-    int n = (int)N*ran.r(); double x = r[n], y = r[n+1];
+    int n = (int)N*ran.r(); double x = r[n][0], y = r[n][1];
     double drx = dr*(2*ran.r()-1), dry = dr*(2*ran.r()-1);
 
     // Periodic boundaries
@@ -86,11 +86,11 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
     double dE = calculate_energy(n, x_new, y_new) - calculate_energy(n, x, y);
 
     if(dE <= 0){
-        r[n] = x_new; r[n+1] = y_new;
+        r[n][0] = x_new; r[n][1] = y_new;
         return;
     }
     else if(ran.r() < std::exp(-beta*dE)){
-        r[n] = x_new; r[n+1] = y_new;
+        r[n][0] = x_new; r[n][1] = y_new;
         return;
     }
 }
@@ -103,8 +103,8 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
 double Metropolis::get_mean_r(void){
     double mean_r = 0;
 
-    for(int n1=0; n1<N_iter; n1+=2)
-        for(int n2=n1+2; n2<N_iter; n2+=2)
+    for(int n1=0; n1<N; n1++)
+        for(int n2=n1+2; n2<N; n2++)
             mean_r += calculate_r_min(n1, n2);
 
     mean_r /= N_connections;
@@ -113,6 +113,6 @@ double Metropolis::get_mean_r(void){
 }
 
 void Metropolis::print(void){
-    for(int n=0; n<N_iter; n+=2)
-        std::cout << " , " << r[n] << "+0.1*cos(t)," << r[n+1] << "+0.1*sin(t)";
+    for(int n=0; n<N; n++)
+        std::cout << " , " << r[n][0] << "+0.1*cos(t)," << r[n][1] << "+0.1*sin(t)";
 }
