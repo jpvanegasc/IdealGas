@@ -1,5 +1,5 @@
 /**
- * Monte Carlo Ising 2D by Metropolis algorithm
+ * 2D Monte Carlo by Metropolis algorithm
  */
 #include"constants.h"
 
@@ -41,6 +41,13 @@ double Metropolis::calculate_energy(int n_particle, double x, double y){
     return E;
 }
 
+/**
+ * Calculates the minimum distance between a given pair of particles
+ * 
+ * @params from, destination: ids of the particles whose distance is being calculated
+ * 
+ * @return minimum distance
+ */
 double Metropolis::calculate_r_min(int from, int destination){
     double x1 = r[from], y1 = r[from+1];
     double x2 = r[destination], y2 = r[destination+1];
@@ -50,9 +57,7 @@ double Metropolis::calculate_r_min(int from, int destination){
     );
 }
 
-/**
- * Initialize both boxes with random positions
- */
+/* Initialize with random positions */
 void Metropolis::initialize(CRandom &ran){
     for(int n=0; n<N; n+=2){
         r[n] = L*ran.r(); r[n+1] = L*ran.r();
@@ -60,11 +65,9 @@ void Metropolis::initialize(CRandom &ran){
 }
 
 /**
- * Moves a single particle within its box using the Metropolis criteria, with periodic boundaries.
- * -> Not very good yet. Selection from within box is not fully correct
+ * Moves a single particle using the Metropolis criteria, with periodic boundaries.
  * 
  * @param beta: Thermodynamic beta
- * @param box: id of box frmom which the particle is being selected
  */
 void Metropolis::metropolis_step(double beta, CRandom &ran){
     int n = (int)N*ran.r(); double x = r[n], y = r[n+1];
@@ -92,6 +95,11 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
     }
 }
 
+/**
+ * Calculates the mean minimum distance between all particles of the system in a given state
+ * 
+ * @return minimum mean distance
+ */
 double Metropolis::get_mean_r(void){
     double mean_r = 0;
 
