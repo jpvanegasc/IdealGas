@@ -1,6 +1,6 @@
 /**
  * Main  module. This is not for creating animations, its sole purpose is saving & processing data
- * For anmations please use animate.cpp
+ * For animations please use animate.cpp
  */
 #include"metropolis2D.h"
 

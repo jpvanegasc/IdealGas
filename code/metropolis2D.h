@@ -28,7 +28,7 @@ class Metropolis{
 double Metropolis::calculate_energy(int n_particle, double x, double y){
     double E = 0;
 
-    for(int n=0; n<N; n+=2){
+    for(int n=0; n<N_iter; n+=2){
         if(n == n_particle) continue;
 
         double ix = r[n], iy = r[n+1];
@@ -59,7 +59,7 @@ double Metropolis::calculate_r_min(int from, int destination){
 
 /* Initialize with random positions */
 void Metropolis::initialize(CRandom &ran){
-    for(int n=0; n<N; n+=2){
+    for(int n=0; n<N_iter; n++){
         r[n] = L*ran.r(); r[n+1] = L*ran.r();
     }
 }
@@ -103,16 +103,16 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
 double Metropolis::get_mean_r(void){
     double mean_r = 0;
 
-    for(int n1=0; n1<N; n1++)
-        for(int n2=n1+1; n2<N; n2++)
+    for(int n1=0; n1<N_iter; n1+=2)
+        for(int n2=n1+2; n2<N_iter; n2+=2)
             mean_r += calculate_r_min(n1, n2);
 
-    mean_r /= (double)((N*(N-1))/2);
+    mean_r /= N_connections;
 
     return mean_r;
 }
 
 void Metropolis::print(void){
-    for(int n=0; n<N; n+=2)
+    for(int n=0; n<N_iter; n+=2)
         std::cout << " , " << r[n] << "+0.1*cos(t)," << r[n+1] << "+0.1*sin(t)";
 }
