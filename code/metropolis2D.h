@@ -25,17 +25,18 @@ class Metropolis{
  * 
  * @return Energy for a given particle
  */
-double Metropolis::calculate_energy(int n_particle, double x, double y){
+double Metropolis::calculate_energy(int n_particle, double x0, double y0){
     double E = 0;
 
     for(int n=0; n<N; n++){
         if(n == n_particle) continue;
 
-        double ix = r[n][0], iy = r[n][1];
-        E += 4*(
-            std::pow(((ix-x)*(ix-x) + (iy-y)*(iy-y)), -6.0) -
-            std::pow(((ix-x)*(ix-x) + (iy-y)*(iy-y)), -3.0)
-        );
+        double x_temp = r[n][0], y_temp = r[n][1];
+        x_temp = x_temp - x0 - L*std::fabs((x_temp-x0)/L);
+        y_temp = y_temp - y0 - L*std::fabs((y_temp-y0)/L);
+        double r2 = x_temp*x_temp + y_temp*y_temp;
+
+        E += 4*(std::pow(r2, -6.0) - std::pow(r2, -3.0));
     }
 
     return E;

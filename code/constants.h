@@ -11,7 +11,7 @@ const int N = 80;
 const double L = 16;
 const double L2 = L*L;
 
-const double dr = 1;
+const double dr = 0.1;
 const double N_connections = (double)((N*(N-1))/2);
 
 // Time constants
