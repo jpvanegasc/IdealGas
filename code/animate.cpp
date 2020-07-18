@@ -7,20 +7,25 @@
 
 int main(int argc, char *argv[]){
     CRandom ran64(1);
-    Metropolis Ising;
+    Metropolis Gas;
 
-    double T = 0.01;
+    double T = 1000;
     double beta = 1.0/(kB*T);
 
-    Ising.initialize(ran64);
+    Gas.initialize(ran64);
     start_animation(argc);
 
-    for(int t=0; t<t_eq/2; t++){
+
+    for(int t=0; t<t_eq; t++)
+        for(int mcs=0; mcs<N; mcs++)
+            Gas.metropolis_step(beta, ran64);
+
+    for(int t=0; t<100; t++){
         begin_frame(argc);
-        Ising.print();
+        Gas.print();
         end_frame(argc);
 
-        Ising.metropolis_step(beta, ran64);
+        Gas.metropolis_step(beta, ran64);
     }
 
     return 0;
