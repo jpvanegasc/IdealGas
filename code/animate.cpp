@@ -20,11 +20,7 @@ int main(int argc, char *argv[]){
         Ising.print();
         end_frame(argc);
 
-        Ising.metropolis_translation(beta, ran64, 0);
-        Ising.metropolis_translation(beta, ran64, 1);
-
-        Ising.metropolis_transfer(0, 1, beta, ran64);
-        Ising.metropolis_transfer(1, 0, beta, ran64);
+        Ising.metropolis_step(beta, ran64);
     }
 
     return 0;
