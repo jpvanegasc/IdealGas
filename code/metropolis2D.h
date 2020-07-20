@@ -7,8 +7,7 @@ class Metropolis{
     private:
         double r[N][D] = {0};
 
-        double calculate_energy(int n_particle, double x, double y);
-        double calculate_r_min(int from, int destination);
+        double calculate_energy(int &n_particle, double &x0, double &y0);
     public:
         void initialize(CRandom &ran);
         void metropolis_step(double beta, CRandom &ran);
@@ -18,44 +17,43 @@ class Metropolis{
 
 /**
  * Calculates the energy for a given particle on a given postion using the Lennard-Jones interaction
- * potential.
+ * potential. This function is the most called of all the module, so it's heavily optimized. Sorry 
+ * if it's not very readable.
  * 
  * @param n_particle: particle id that is being calculated
- * @params x, y: x and y positions of particle that is being calculated
+ * @param x: x position of particle that is being calculated
+ * @param y: y position of particle that is being calculated
  * 
  * @return Energy for a given particle
  */
-double Metropolis::calculate_energy(int n_particle, double x0, double y0){
-    double E = 0;
+double Metropolis::calculate_energy(int &n_particle, double &x0, double &y0){
+    double E = 0, dx = 0, dy = 0, dr2 = 0; int n = 0;
 
-    for(int n=0; n<N; n++){
-        if(n == n_particle) continue;
+    for(n=0; n<n_particle; n++){
+        dx = r[n][0] - x0; dy = r[n][1] - y0;
+        dx -= L*std::fabs(dx/L);
+        dy -= L*std::fabs(dy/L);
 
-        double x_temp = r[n][0], y_temp = r[n][1];
-        x_temp = x_temp - x0 - L*std::fabs((x_temp-x0)/L);
-        y_temp = y_temp - y0 - L*std::fabs((y_temp-y0)/L);
-        double r2 = x_temp*x_temp + y_temp*y_temp;
+        dr2 = dx*dx + dy*dy;
+        dr2 *= dr2*dr2;
+        dr2 = 1/dr2;
 
-        E += 4*(std::pow(r2, -6.0) - std::pow(r2, -3.0));
+        E += 4*dr2*(dr2-1);
+    }
+    for(n=n_particle+1; n<N; n++){
+
+        dx = r[n][0] - x0; dy = r[n][1] - y0;
+        dx -= L*std::fabs(dx/L);
+        dy -= L*std::fabs(dy/L);
+
+        dr2 = dx*dx + dy*dy;
+        dr2 *= dr2*dr2;
+        dr2 = 1/dr2;
+
+        E += 4*dr2*(dr2-1);
     }
 
     return E;
-}
-
-/**
- * Calculates the minimum distance between a given pair of particles
- * 
- * @params from, destination: ids of the particles whose distance is being calculated
- * 
- * @return minimum distance
- */
-double Metropolis::calculate_r_min(int from, int destination){
-    double x1 = r[from][0], y1 = r[from][1];
-    double x2 = r[destination][0], y2 = r[destination][1];
-    return std::sqrt(
-        (x1 - x2 - L*std::fabs((x1-x2)/L))*(x1 - x2 - L*std::fabs((x1-x2)/L)) +
-        (y1 - y2 - L*std::fabs((y1-y2)/L))*(y1 - y2 - L*std::fabs((y1-y2)/L))
-    );
 }
 
 /* Initialize with random positions */
@@ -81,7 +79,7 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
     else if(x_new > L) x_new -= L;
 
     if(y_new < 0) y_new += L;
-    if(y_new > L) y_new -= L;
+    else if(y_new > L) y_new -= L;
 
     // Metropolis criteria
     double dE = calculate_energy(n, x_new, y_new) - calculate_energy(n, x, y);
@@ -102,11 +100,18 @@ void Metropolis::metropolis_step(double beta, CRandom &ran){
  * @return minimum mean distance
  */
 double Metropolis::get_mean_r(void){
-    double mean_r = 0;
+    double mean_r = 0, dx = 0, dy = 0, dr2 = 0;
 
     for(int n1=0; n1<N; n1++)
-        for(int n2=n1+2; n2<N; n2++)
-            mean_r += calculate_r_min(n1, n2);
+        for(int n2=n1+1; n2<N; n2++){
+            dx = r[n1][0] - r[n2][0]; dy = r[n1][1] - r[n2][1];
+            dx -= L*std::fabs(dx/L);
+            dy -= L*std::fabs(dy/L);
+
+            dr2 = dx*dx + dy*dy;
+
+            mean_r += std::sqrt(dr2);
+        }
 
     mean_r /= N_connections;
 
