@@ -1,4 +1,6 @@
-# Rigid Sphere Gas Simulation
+# Lennard-Jones Gas Simulation
+This project aim is to reproduce the behavior of a Lennard-Jones gas by using the Monte Carlo method, 
+and to study different phenomena, as phase changes, entropy and condensations.
 
 ## Compilation 
 All code must be compiled using c++11. A standard compilation would be 
